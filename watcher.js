@@ -18,6 +18,4 @@ class Watcher{ // 观察者
             this.cb(newVal)
         }
     }
-    
-
 }
