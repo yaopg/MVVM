@@ -5,6 +5,15 @@ const ComplilUtil = {
             return prev[next]
         }, vm.$data)
     },
+    setVal(vm,expr,value){
+        expr.split(".").reduce((initData,curProp,index,arr)=>{
+            if(index===arr.length-1){
+                initData[curProp]=value;
+                return;
+            }
+            return initData[curProp];
+        },vm.$data)
+    },
     text(node, expr, vm) {
         let value = null;
         let updateFn = this.textUpdater
@@ -24,5 +33,23 @@ const ComplilUtil = {
         return expr.replace(/\{\{([^}]+)\}\}/g, (...arguments) => {
             return this.getVal(vm, arguments[1])
         })
+    },
+    //双向绑定，指令
+    model(node,vm,expr){
+        let value =this.getVal(vm,expr);
+        const fn=this.modelUpdater;
+        fn(node,value);
+        //需要绑定一个监听器来绑定
+        node.addEventListener('input',(e)=>{
+            const newvalue=e.target.value;
+            this.setVal(vm,expr,newvalue)
+        })
+        new Watcher(vm,expr,newVal=>{
+          fn(node,newVal);
+        });
+    },
+    //更新节点
+    modelUpdater(node,newVal){
+        node.value=newVal
     }
 }

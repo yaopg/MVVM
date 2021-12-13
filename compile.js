@@ -27,8 +27,9 @@ class Compile{
         //console.log(typeof childNodes);
        Array.from(childNodes).forEach(item=>{
             if(this.isElementNode(item)){
-                //元素
                 //console.log(item)
+                this.compileElemnet(item)
+                this.compile(item)
             }else{
                 //文本
                 this.compileText(item);
@@ -44,11 +45,30 @@ class Compile{
         }
     }
 
-
-
+    //4、处理节点
+    compileElemnet(node){
+        const attrs=node.attributes;
+        console.log(attrs)
+        //遍历节点
+        Array.from(attrs).forEach(item=>{
+            //结构化赋值
+            let {name,value:expr}=item;
+            if(this.isDirctive(name)){
+                //只考虑到v-model的情况
+                let [,directive]=name.split("-");
+                console.log(directive,'directive')
+                let [directiveName,eventName]=directive.split(":");
+                ComplilUtil[directive](node,this.vm,expr,eventName)
+            }
+        })
+    }
     //工具方法
     //1、判断是否为元素节点
     isElementNode(node){
         return node.nodeType===1
+    }
+    //2、判断是否为指令
+    isDirctive(attr){
+        return attr.includes('v-')
     }
 }
