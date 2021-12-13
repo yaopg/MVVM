@@ -5,5 +5,19 @@ class MvvC{
         this.$data=option.data;
         new Observe(this.$data)
         new Compile(this.$el,this)
+        //代理$data
+        Object.keys(this.$data).forEach(key=>{
+            this.proxy(key)
+        })
+    }
+    proxy(key){
+        Object.defineProperty(this,key,{
+            get(){
+                return this.$data[key]
+            },
+            set(value){
+                this.$data[key]=value
+            }
+        })
     }
 }
